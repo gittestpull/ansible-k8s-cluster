@@ -1,0 +1,26 @@
+import ftplib
+import os
+import smtplib
+from email.mime.text import MIMEText
+
+#filename = "ansible.cfg"
+data = []
+datelist = []
+filelist = []
+ftp = ftplib.FTP()
+ftp.connect("192.168.205.10","21")
+ftp.login("vagrant", "vagrant")     
+for root, dirs, files in os.walk('/home/vagrant/ansible-kubernetes-kubeadm-ha'):
+    for fname in files:
+        full_fname = os.path.join(root, fname)
+        ftp.storbinary('STOR /home/vagrant/df/' + fname, open(full_fname, 'rb'))
+        print full_fname
+        filelist.append(full_fname.replace('\n',','))
+
+print(filelist)
+s = smtplib.SMTP('127.0.0.1', 25)
+msg = MIMEText(filelist,'plain','utf-8')
+msg['Subject'] = 'test sub'
+s.sendmail("ysk7998@gmail.com", "ysk79@neople.co.kr", msg.as_string())
+print msg
+s.quit()
